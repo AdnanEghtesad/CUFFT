@@ -1,2 +1,5 @@
-optirun pgcpp  -Mcuda -ta=tesla  CUFFT_brief.cc -I/usr/local/cuda-8.0/include -L/usr/local/cuda-8.0/lib64 -lcufft 
+pgc++ -acc -Mcuda -Mcudalib=cufft -ta=tesla  Great_Simple_CUFFT_3d.cc -I/usr/local/cuda-7.5/include -L/usr/local/cuda-7.5/lib64 -lcufft -lcudart -lcuda
+
+
+ 
 
