@@ -1,0 +1,5 @@
+pgc++ -acc -fast -tp=p7 -Mcuda -Minfo=accel -ta=tesla -Mcudalib=cufft -ta=tesla  Great_Simple_CUFFT_3d_OPENACC.c 
+
+
+ 
+

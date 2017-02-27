@@ -5,9 +5,9 @@
 #include <cuda_runtime.h>
 #include <cufft.h> 
 
-#define NX 2
-#define NY 2
-#define NZ 2
+#define NX 128
+#define NY 128
+#define NZ 128
 #define LX (2*M_PI)
 #define LY (2*M_PI)
 #define LZ (2*M_PI)
@@ -35,25 +35,35 @@ int main()
   }
 
   float *d_vx;
+  
+  struct timespec now, tmstart;
+  clock_gettime(CLOCK_REALTIME, &tmstart);
+  
   cudaMalloc(&d_vx, NX*NY*NZ*sizeof(fftw_complex));
+ 
+  
   cudaMemcpy(d_vx, vx, NX*NY*NZ*sizeof(fftw_complex), cudaMemcpyHostToDevice);
-
+  
+  
+  
   cufftHandle planc2c;
   cufftPlan3d(&planc2c, NZ,NY, NX, CUFFT_C2C);
   cufftSetCompatibilityMode(planc2c, CUFFT_COMPATIBILITY_NATIVE);
 
-  struct timespec now, tmstart;
-  clock_gettime(CLOCK_REALTIME, &tmstart);
-
+  
+  
   cufftExecC2C(planc2c, (cufftComplex *)d_vx, (cufftComplex *)d_vx, CUFFT_FORWARD);
 
+  
+
+
+  cudaMemcpy(vx, d_vx, NX*NY*NZ*sizeof(fftw_complex), cudaMemcpyDeviceToHost);
+  
   clock_gettime(CLOCK_REALTIME, &now);
   acc_time += (now.tv_sec+now.tv_nsec*1e-9) - (tmstart.tv_sec+tmstart.tv_nsec*1e-9);
   acc_n++;
-
-  cudaMemcpy(vx, d_vx, NX*NY*NZ*sizeof(fftw_complex), cudaMemcpyDeviceToHost);
-
   printf("avg CUFFT time : %g total time %g\n", acc_time / acc_n, acc_time);
+ 
 #if 1									       
   getchar();
 #endif
@@ -62,8 +72,8 @@ int main()
     for (int j = 0; j < NY; j++){
       for (int i = 0; i < NX; i++){
 	printf("(%.3f,%.3f) ",
-	       vx[(k*NY + j)*NX + i][REAL] / (NX*NY*NZ),
-	       vx[(k*NY + j)*NX + i][IMAG] / (NX*NY*NZ));
+	       vx[(k*NY + j)*NX + i][REAL]  ,
+	       vx[(k*NY + j)*NX + i][IMAG] );
       }
       printf("\n");
     } 
